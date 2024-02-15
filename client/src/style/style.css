@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600&display=swap');
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+.menu-container {
+display: flex;
+align-items: center;
+}
+
+.title{
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-weight: 200px;
+  
+}
+
+.ant-layout-footer {
+position: fixed;
+bottom: 0;
+width: 100%;
+text-align: center;
+background: #001529;
+color: white;
+padding: 10px; 
+}
+
+.button-style {
+background-color: white;
+border-color: white;
+color: #001529;
+margin-right: 3em;
+width: 10em;
+height: 3em;
+font-size: 18px; 
+}
+
+.button-premiere {
+  background-color: gold;
+  border-color: gold;
+  color: #001529;
+  margin-right: 3em;
+  width: 10em;
+  height: 3em;
+  font-size: 18px; 
+  }
+  
+
+
+.cancel-container {
+  padding: 20px; 
+  margin: 3em auto 0; 
+  width: 80%; 
+  max-width: 60em; 
+  box-sizing: border-box; 
+  border-radius: 10px;
+  height: 25em;
+  background-color: rgba(255, 255, 255, 0.671);
+  overflow: auto; /* or overflow: hidden; or overflow: scroll; depending on your preference */
+}
+.cancel-container::-webkit-scrollbar {
+  width: 10px; /* Width of the scrollbar */
+}
+
+.cancel-container::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Track color */
+  border-radius: 10px;
+}
+
+.cancel-container::-webkit-scrollbar-thumb {
+  background: #888; /* Thumb color */
+  border-radius: 5px; /* Roundness of the thumb */
+}
+
+.cancel-container::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Thumb color on hover */
+}
+.back-container{ 
+margin: 3em auto 0; 
+width: 80%; 
+max-width: 60em; 
+box-sizing: border-box; 
+
+}
+.reserve-container {
+background-color: #001529; 
+border: 1px solid #001529;
+padding: 10px; 
+margin: 1em auto 0; 
+width: 80%; 
+max-width: 10em; 
+box-sizing: border-box; 
+border-radius: 10px;
+text-align: center;
+color: white;
+font-family: 'Inter', sans-serif;
+}
+
+.screen-box {
+background-color: #001529; 
+border: 1px solid #001529;
+margin-top: 1em;
+padding: 1px; 
+width: 100%; 
+max-width: 30em; 
+box-sizing: border-box; 
+border-radius: 10px;
+text-align: center;
+color: white;
+margin-left: 5em;
+}
+.info-box {
+margin-left: 45em;
+border-left: 1px solid gray;
+padding-left: 10px; 
+}
+
+/* para lang sa naay style */
+.ticket-container {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ticket-container th, .ticket-container td {
+  padding: 8px;
+  text-align: left;
+}
+
+/* .ticket-container th {
+  background-color: #f2f2f2;
+}
+
+.ticket-container tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.ticket-container tbody tr:hover {
+  background-color: #ddd;
+} */
+
+.ticket-container button {
+  background-color: red;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 600px) {
+  .ticket-container th, .ticket-container td {
+    padding: 4px;
+    font-size: 12px;
+  }
+}
+h3{
+  font-family: 'Inter', sans-serif;
+  font-weight: 200px;
+}
+

@@ -1,0 +1,4 @@
+first : npm init //install necessary dependecies
+second : npm add express //install express package inside our file
+third : npm add nodemon --save-dev //resrat the js package if there is any change
+fourth : npm install mongoose //to connect with mongoDB
