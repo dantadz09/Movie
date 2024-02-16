@@ -27,13 +27,14 @@ function Cancel() {
   }
 
   const handleFilter = () => {
-    const reservation = reservations.find(reservation => reservation.id === filteredReservationId);
+    const reservation = reservations.find(reservation => reservation.ticket_number === parseInt(filteredReservationId));
     if (reservation) {
       setFilteredReservation(reservation);
     } else {
       setFilteredReservation(null);
     }
-  }
+  }  
+  
 
   const handleDelButtonClick = (reservationId) => {
     setReservationIdToDelete(reservationId);
@@ -88,9 +89,9 @@ function Cancel() {
         </div>
         <br></br>
         <table className='ticket-container'>
-        <thead style={{ fontFamily: "'Inter', sans-serif", fontSize: '15px' }}>
+          <thead>
             <tr>
-              <th>Reservation ID</th>
+              <th>Ticket Number</th>
               <th>Title</th>
               <th>Airing Time</th>
               <th>Seat</th>
@@ -99,10 +100,10 @@ function Cancel() {
               <th>Delete</th>
             </tr>
           </thead>
-          <tbody style={{ fontFamily: "'Inter', sans-serif", fontSize: '15px' }}>
+          <tbody>
             {filteredReservation ? (
               <tr key={filteredReservation.id}>
-                <td>{filteredReservation.id}</td>
+                <td>{filteredReservation.ticket_number}</td>
                 <td>{filteredReservation.title}</td>
                 <td>{new Date(filteredReservation.start_time).toLocaleString()}</td>
                 <td>{filteredReservation.seat.map(seat => seat.seatNumber).join(', ')}</td>
@@ -113,20 +114,13 @@ function Cancel() {
             ) : (
               reservations.map(reservation => (
                 <tr key={reservation.id}>
-                  <td>{reservation.id}</td>
+                  <td >{reservation.ticket_number}</td>
                   <td>{reservation.title}</td>
                   <td>{new Date(reservation.start_time).toLocaleString()}</td>
                   <td>{reservation.seat.map(seat => seat.seatNumber).join(', ')}</td>
-                  <td style={{ textAlign: 'center' }}>{reservation.total_price}</td>
-                  <td style={{ textAlign: 'center' }}>{reservation.senior_citizen}</td>
-                  <td><button onClick={() => handleDelButtonClick(reservation.id)}
-                  style={{ 
-                    backgroundColor: 'red',
-                    borderRadius: '5px',
-                    color: 'white',
-                    padding: '5px 10px',
-                    border: 'none'
-                  }}>Delete</button></td>
+                  <td style ={{textAlign: 'center'}}>{reservation.total_price}</td>
+                  <td style ={{textAlign: 'center'}}>{reservation.senior_citizen}</td>
+                  <td><button onClick={() => handleDelButtonClick(reservation.id)}>Delete</button></td>
                 </tr>
               ))
             )}

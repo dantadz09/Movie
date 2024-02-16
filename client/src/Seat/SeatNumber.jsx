@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Button } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 function SeatNumber({ setSelectedSeatCount, setSelectedSeats, reservedSeats }) {
   const numRows = 8;
   const numCols = 5;
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const [selectedSeats, setSelectedSeatsState] = useState([]);
 
@@ -22,6 +24,16 @@ function SeatNumber({ setSelectedSeatCount, setSelectedSeats, reservedSeats }) {
     setSelectedSeats(selectedSeats); // Pass the array of selected seat values to the parent component
   }, [selectedSeats, setSelectedSeatCount, setSelectedSeats]);
 
+  useEffect(() => {
+    const totalSeats = numRows * numCols;
+    const reservedSeatCount = reservedSeats?.reduce((total, reservation) => total + reservation.seat.length, 0);
+    if (reservedSeatCount === totalSeats) {
+      // Show alert and navigate to home page
+      alert("All seats are reserved!");
+      navigate('/'); // Navigate back to home page
+    }
+  }, [reservedSeats, numRows, numCols, navigate]);
+
   const renderButtons = () => {
     const buttons = [];
     
@@ -37,6 +49,7 @@ function SeatNumber({ setSelectedSeatCount, setSelectedSeats, reservedSeats }) {
           marginBottom: '1em',
           marginLeft: '2em',
           textAlign: 'center',
+          color: 'black',
           backgroundColor: isReserved ? 'red' : (isSelected ? 'primary' : 'default'), // Change background color to red if seat is reserved
         };
         

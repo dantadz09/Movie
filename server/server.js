@@ -7,7 +7,6 @@ const mongoose = require('mongoose');
 // Import Controllers
 const movieController = require('./controllers/movieController');
 const reserveController = require('./controllers/reserveController');
-const getAllMovieController = require('./controllers/getAllMovieController');
 const scheduleController = require('./controllers/scheduleController');
 const seatController = require('./controllers/seatController');
 app.use(cors({
@@ -22,7 +21,6 @@ app.use('/api', movieController);
 // reserveController routes
 app.use('/api', reserveController);
 
-app.use('/api', getAllMovieController);
 
 app.use('/api', scheduleController);
 

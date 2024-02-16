@@ -16,6 +16,7 @@ router.get('/get-all-reservations', async (req, res) => {
             if (matchingAiringTime) {
                 return {
                     id: reservation._id,
+                    ticket_number: reservation.reservationId,
                     start_time: matchingAiringTime.start_time,
                     title: reservation.mov_ID.title,
                     seat: reservation.seat,
@@ -38,7 +39,7 @@ router.get('/get-all-reservations', async (req, res) => {
             message: error.message,
         });
     }
-});
+}); 
 
 //get reserve
 router.get('/get-seat/:id', async (req, res) => {

@@ -58,6 +58,11 @@ function Schedule() {
                   <Link to={`/seat/${movie._id}/${time._id}`} key={index} style={{ marginRight: '10px' }}>
                     <Button type="primary" className={time.is_premiere ? "button-premiere" : "button-style"}>
                       {new Date(time.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                      {time.is_premiere ? (
+                        <p style={{ marginBottom: '0', color: 'red' }}>Premiere</p>
+                      ) : (
+                        <p style={{ marginBottom: '0', color: 'white' }}>Normal</p>
+                      )}
                     </Button>
                   </Link>
                 ))}
