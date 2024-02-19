@@ -11,6 +11,8 @@ const movieSchema = new mongoose.Schema({
     cin_ID: String,
     title: String,
     image: String,
+    duration: String,
+    desc: String,
     airing_time: [airingTimeSchema] // Embedding airing time schema array
 });
 

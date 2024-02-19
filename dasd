@@ -1,0 +1,168 @@
+[1mdiff --git a/client/src/Home/Home.jsx b/client/src/Home/Home.jsx[m
+[1mindex 6d471f3..b10afd7 100644[m
+[1m--- a/client/src/Home/Home.jsx[m
+[1m+++ b/client/src/Home/Home.jsx[m
+[36m@@ -31,19 +31,19 @@[m [mfunction Home() {[m
+   const bgImageSrc = "http://localhost:3000/bg.jpg"; // Define your background image source here[m
+ [m
+   return ([m
+[31m-    <div style={{ [m
+[31m-      backgroundImage: `url(${bgImageSrc})`, [m
+[31m-      backgroundSize: 'cover', [m
+[31m-      backgroundPosition: 'center', [m
+[31m-      minHeight: '85vh', [m
+[31m-      paddingTop: '1px' [m
+[31m-    }}>      [m
+[32m+[m[32m    <div style={{[m
+[32m+[m[32m      backgroundImage: `url(${bgImageSrc})`,[m
+[32m+[m[32m      backgroundSize: 'cover',[m
+[32m+[m[32m      backgroundPosition: 'center',[m
+[32m+[m[32m      minHeight: '85vh',[m
+[32m+[m[32m      paddingTop: '1px'[m
+[32m+[m[32m    }}>[m
+       <div className='title'>[m
+         <h1 style={{ color: 'white' }}>Now Showing</h1>[m
+[31m-        <DatePicker [m
+[31m-          onChange={handleDateChange} [m
+[32m+[m[32m        <DatePicker[m
+[32m+[m[32m          onChange={handleDateChange}[m
+           defaultValue={dayjs()}[m
+[31m-          allowClear={false} [m
+[32m+[m[32m          allowClear={false}[m
+           inputStyle={{ background: movieExists ? 'blue' : 'transparent', color: 'white' }} // Change background color of input[m
+         />[m
+       </div>[m
+[1mdiff --git a/client/src/Schedule/Schedule.jsx b/client/src/Schedule/Schedule.jsx[m
+[1mindex 51658c9..beec7e6 100644[m
+[1m--- a/client/src/Schedule/Schedule.jsx[m
+[1m+++ b/client/src/Schedule/Schedule.jsx[m
+[36m@@ -26,14 +26,6 @@[m [mfunction Schedule() {[m
+     fetchMovie();[m
+   }, [movieId]);[m
+ [m
+[31m-  const isClickable = (time) => {[m
+[31m-    const startTime = new Date(time.start_time);[m
+[31m-    const currentTime = new Date();[m
+[31m-[m
+[31m-    // Compare the current time with the start time of the movie[m
+[31m-    return currentTime < startTime;[m
+[31m-  };[m
+[31m-[m
+   return ([m
+     <div style={{ [m
+       backgroundImage: `url(${bgImageSrc})`, [m
+[36m@@ -66,11 +58,7 @@[m [mfunction Schedule() {[m
+               <div>[m
+                 {movie.airing_time && movie.airing_time.map((time, index) => ([m
+                   <Link to={`/seat/${movie._id}/${time._id}`} key={index} style={{ marginRight: '5px' }}>[m
+[31m-                    <Button [m
+[31m-                      type="primary" [m
+[31m-                      className={time.is_premiere ? "button-premiere" : "button-style"} [m
+[31m-                      disabled={!isClickable(time)}[m
+[31m-                    >[m
+[32m+[m[32m                    <Button type="primary" className={time.is_premiere ? "button-premiere" : "button-style"}>[m
+                       {`${new Date(time.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`}[m
+                       -{new Date(time.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}[m
+                       {time.is_premiere ? ([m
+[1mdiff --git a/client/src/Seat/Seat.jsx b/client/src/Seat/Seat.jsx[m
+[1mindex 029e644..18e8289 100644[m
+[1m--- a/client/src/Seat/Seat.jsx[m
+[1m+++ b/client/src/Seat/Seat.jsx[m
+[36m@@ -39,13 +39,12 @@[m [mfunction Seat() {[m
+ [m
+     fetchMovie();[m
+   }, [movieId, airingTimeId]);[m
+[31m-  //get airing time from the backend[m
+[32m+[m[32m  //get airing Time from the backend[m
+   const airingTime = movie && movie.airing_time && movie.airing_time.length > 0 ? movie.airing_time.find(time => time._id === airingTimeId) : null;[m
+   const pricePerTicket = airingTime ? airingTime.price : 0;[m
+   //change time to PH time[m
+   const airingTimeStart = airingTime ? new Date(airingTime.start_time).toLocaleString("en-US", { timeZone: "Asia/Manila" }) : 'Loading...';[m
+   const subtotal = pricePerTicket * selectedSeatCount;[m
+[31m-  //calculate the price and discount[m
+   const discountedPrice = Math.min((pricePerTicket * 0.8) * discountCount, pricePerTicket * selectedSeatCount);[m
+   const discountValue = discountCount * 70;[m
+   const temp = selectedSeatCount - discountCount;[m
+[36m@@ -67,7 +66,7 @@[m [mfunction Seat() {[m
+     }[m
+   };[m
+   [m
+[31m-  //buy now function[m
+[32m+[m
+   const handleBuyNow = () => {[m
+     if (selectedSeatCount === 0) {[m
+       console.log("No seats selected. Reservation not made.");[m
+[36m@@ -82,26 +81,37 @@[m [mfunction Seat() {[m
+       const reservationData = {[m
+         mov_ID: movie._id,[m
+         airing_time: airingTimeId,[m
+[31m-        seat: selectedSeats.map(seatNumber => ({ seatNumber })),[m
+[32m+[m[32m        seat: selectedSeats.map((seatNumber) => ({ seatNumber })),[m
+         total_price: total,[m
+[31m-        senior_citizen: discountCount[m
+[32m+[m[32m        senior_citizen: discountCount,[m
+       };[m
+[31m-[m
+[31m-      const response = await axios.post('http://localhost:1337/api/add-reservation', reservationData);[m
+[31m-[m
+[32m+[m[41m  [m
+[32m+[m[32m      const response = await axios.post([m
+[32m+[m[32m        "http://localhost:1337/api/add-reservation",[m
+[32m+[m[32m        reservationData[m
+[32m+[m[32m      );[m
+[32m+[m[41m  [m
+       if (response.status === 200) {[m
+[31m-        console.log('Reservation created successfully:', response.data);[m
+[32m+[m[32m        console.log("Reservation created successfully:", response.data);[m
+[32m+[m[41m  [m
+[32m+[m[32m        // Extract reservation ID from the response[m
+[32m+[m[32m        const reservationId = response.data.reservation.reservationId;[m
+[32m+[m[41m  [m
+         setModalVisible(false);[m
+[31m-        window.location.reload(); // Refresh the page after successful reservation[m
+[32m+[m[32m        Modal.success({[m
+[32m+[m[32m          title: 'Reservation Created Successfully',[m
+[32m+[m[32m          content: `Your reservation with Ticket Number ${reservationId} has been created successfully.`,[m
+[32m+[m[32m          onOk: () => window.location.reload(), // Refresh the page after successful reservation[m
+[32m+[m[32m        });[m
+       } else {[m
+[31m-        throw new Error('Failed to create reservation');[m
+[32m+[m[32m        throw new Error("Failed to create reservation");[m
+       }[m
+     } catch (error) {[m
+[31m-      console.error('Error creating reservation:', error);[m
+[32m+[m[32m      console.error("Error creating reservation:", error);[m
+       setModalVisible(false);[m
+     }[m
+[31m-  };[m
+[31m-  //cancel modal[m
+[32m+[m[32m  };[m[41m  [m
+[32m+[m
+   const handleCancel = () => {[m
+     setModalVisible(false);[m
+   };[m
+[1mdiff --git a/client/src/Seat/SeatNumber.jsx b/client/src/Seat/SeatNumber.jsx[m
+[1mindex 3d0320b..851841b 100644[m
+[1m--- a/client/src/Seat/SeatNumber.jsx[m
+[1m+++ b/client/src/Seat/SeatNumber.jsx[m
+[36m@@ -19,7 +19,7 @@[m [mfunction SeatNumber({ setSelectedSeatCount, setSelectedSeats, reservedSeats }) {[m
+   };[m
+ [m
+   // Update the count of selected seats whenever the selected seats change[m
+[31m-  useEffect(() => {[m
+[32m+[m[32m  useEffect(() => {[m[41m [m
+     setSelectedSeatCount(selectedSeats.length);[m
+     setSelectedSeats(selectedSeats); // Pass the array of selected seat values to the parent component[m
+   }, [selectedSeats, setSelectedSeatCount, setSelectedSeats]);[m
+[1mdiff --git a/client/src/style/style.css b/client/src/style/style.css[m
+[1mindex 1e0af7f..85237cc 100644[m
+[1m--- a/client/src/style/style.css[m
+[1m+++ b/client/src/style/style.css[m
+[36m@@ -119,7 +119,6 @@[m [mborder-left: 1px solid gray;[m
+ padding-left: 10px; [m
+ }[m
+ [m
+[31m-/* para lang sa naay style */[m
+ .ticket-container {[m
+   width: 100%;[m
+   border-collapse: collapse;[m

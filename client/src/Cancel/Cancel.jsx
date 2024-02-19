@@ -21,11 +21,11 @@ function Cancel() {
 
     getReservations();
   }, []);
-
+  //checks the input value in the filter
   const handleInputChange = (event) => {
     setFilteredReservationId(event.target.value);
   }
-
+  //filter function
   const handleFilter = () => {
     const reservation = reservations.find(reservation => reservation.ticket_number === parseInt(filteredReservationId));
     if (reservation) {
@@ -35,12 +35,12 @@ function Cancel() {
     }
   }  
   
-
+  //delete button on click 
   const handleDelButtonClick = (reservationId) => {
     setReservationIdToDelete(reservationId);
     setDeleteModalVisible(true);
   }
-
+  //handle confirm button
   const handleDeleteConfirmed = async () => {
     try {
       const response = await axios.post(`http://127.0.0.1:1337/api/update-reservation/${reservationIdToDelete}`, {
@@ -72,21 +72,6 @@ function Cancel() {
           Reserved Tickets
         </div>
         <br></br>
-        <div style ={{  padding: "8px"}}>
-          <label htmlFor="reservationId">Reservation ID:</label>
-          <input type="text" id="reservationId" name="reservationId" value={filteredReservationId} onChange={handleInputChange} />
-          <button onClick={handleFilter}          
-          style={{ 
-            marginBottom: '10px',
-            marginLeft: '10px',
-            backgroundColor: '#001529',
-            borderRadius: '5px',
-            color: 'white',
-            padding: '3px 10px',
-            border: 'none',
-            cursor: 'pointer' 
-          }}>Filter</button>
-        </div>
         <br></br>
         <table className='ticket-container'>
           <thead>
@@ -126,6 +111,7 @@ function Cancel() {
             )}
           </tbody>
         </table>
+        
         <Modal
           title="Confirmation"
           visible={deleteModalVisible}
@@ -137,6 +123,21 @@ function Cancel() {
           <p>Are you sure you want to delete this reservation?</p>
         </Modal>
       </div>
+      <div style ={{  padding: "8px", marginLeft: '16em'}}>
+          <label htmlFor="reservationId" style={{color: "white"}}>Reservation ID: </label>
+          <input type="text" id="reservationId" name="reservationId" value={filteredReservationId} onChange={handleInputChange} />
+          <button onClick={handleFilter}          
+          style={{ 
+            marginBottom: '10px',
+            marginLeft: '10px',
+            backgroundColor: '#001529',
+            borderRadius: '5px',
+            color: 'white',
+            padding: '3px 10px',
+            border: 'none',
+            cursor: 'pointer' 
+          }}>Filter</button>
+        </div>
     </div>
   )
 }

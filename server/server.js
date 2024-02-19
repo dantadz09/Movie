@@ -21,7 +21,6 @@ app.use('/api', movieController);
 // reserveController routes
 app.use('/api', reserveController);
 
-
 app.use('/api', scheduleController);
 
 app.use('/api', seatController);

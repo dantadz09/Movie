@@ -39,12 +39,14 @@ function Seat() {
 
     fetchMovie();
   }, [movieId, airingTimeId]);
-
+  //get airing Time from the backend
   const airingTime = movie && movie.airing_time && movie.airing_time.length > 0 ? movie.airing_time.find(time => time._id === airingTimeId) : null;
   const pricePerTicket = airingTime ? airingTime.price : 0;
+  //change time to PH time
   const airingTimeStart = airingTime ? new Date(airingTime.start_time).toLocaleString("en-US", { timeZone: "Asia/Manila" }) : 'Loading...';
   const subtotal = pricePerTicket * selectedSeatCount;
   const discountedPrice = Math.min((pricePerTicket * 0.8) * discountCount, pricePerTicket * selectedSeatCount);
+  const discountValue = discountCount * 70;
   const temp = selectedSeatCount - discountCount;
   const total = Math.max((temp * pricePerTicket) + discountedPrice, 0);
 
@@ -79,25 +81,36 @@ function Seat() {
       const reservationData = {
         mov_ID: movie._id,
         airing_time: airingTimeId,
-        seat: selectedSeats.map(seatNumber => ({ seatNumber })),
+        seat: selectedSeats.map((seatNumber) => ({ seatNumber })),
         total_price: total,
-        senior_citizen: discountCount
+        senior_citizen: discountCount,
       };
-
-      const response = await axios.post('http://localhost:1337/api/add-reservation', reservationData);
-
+  
+      const response = await axios.post(
+        "http://localhost:1337/api/add-reservation",
+        reservationData
+      );
+  
       if (response.status === 200) {
-        console.log('Reservation created successfully:', response.data);
+        console.log("Reservation created successfully:", response.data);
+  
+        // Extract reservation ID from the response
+        const reservationId = response.data.reservation.reservationId;
+  
         setModalVisible(false);
-        window.location.reload(); // Refresh the page after successful reservation
+        Modal.success({
+          title: 'Reservation Created Successfully',
+          content: `Your reservation with Ticket Number ${reservationId} has been created successfully.`,
+          onOk: () => window.location.reload(), // Refresh the page after successful reservation
+        });
       } else {
-        throw new Error('Failed to create reservation');
+        throw new Error("Failed to create reservation");
       }
     } catch (error) {
-      console.error('Error creating reservation:', error);
+      console.error("Error creating reservation:", error);
       setModalVisible(false);
     }
-  };
+  };  
 
   const handleCancel = () => {
     setModalVisible(false);
@@ -133,8 +146,9 @@ function Seat() {
             <h3 style={{ marginBottom: '1em',color: 'white' }}>Movie: {movie.title}</h3>
             <h3 style={{ marginBottom: '1em',color: 'white' }}>Date/Time: {airingTimeStart}</h3>
             <h3 style={{ marginBottom: '1em',color: 'white' }}>Tickets: {selectedSeatCount}</h3>
-            <h3 style={{ marginBottom: '1em',color: 'white' }}>Seats: {selectedSeats.join(', ')}</h3>
+            <h3 style={{ marginBottom: '1em', color: 'white' }}>Seats: {selectedSeats.sort().join(', ')}</h3>
             <h3 style={{ marginBottom: '1em',color: 'white' }}>Subtotal: &#8369;{subtotal.toFixed(2)}</h3>
+            <h3 style={{ marginBottom: '1em',color: 'white' }}>Discounted Price: &#8369;{discountValue}</h3>
             {movie.airing_time && movie.airing_time.some(time => airingTime.is_premiere) ? ( 
               <h3 style={{ marginBottom: '1em',color: 'white' }}>Discount not available for premiere</h3>
             ) : (
@@ -153,7 +167,7 @@ function Seat() {
             <Button 
               type="primary" 
               onClick={handleBuyNow} 
-              disabled={selectedSeats.length === 0 || discountCount > selectedSeatCount} 
+              disabled={selectedSeats.length === 0 || discountCount > selectedSeatCount} //checks if seats selected is 0 or discount is greater than selected seat
               style={{ 
                 background: 'white', 
                 fontSize: '16px', 

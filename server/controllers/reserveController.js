@@ -39,7 +39,7 @@ router.get('/get-all-reservations', async (req, res) => {
             message: error.message,
         });
     }
-}); 
+});
 
 //get reserve
 router.get('/get-seat/:id', async (req, res) => {

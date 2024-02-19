@@ -36,36 +36,43 @@ function Schedule() {
     }}>
       {movie && (
         <>
-          <div className='container' style={{ width: '80%', margin: 'auto' }}>
+          <div className='container' style={{ width: '80%', margin: 'auto'}}>
             <div className='movie-container'> 
-              <img src={movie.image} alt="Avengers" style={{ width: '30%', float: 'left', padding: '5px', boxShadow: '0 0 0 3px white' }}/>
+              <img src={movie.image} style={{ width: '30%', float: 'left', padding: '5px', boxShadow: '0 0 0 3px white' }}/>
             </div>
             <div className='movie-info' style={{ marginLeft: '32%', marginTop: '-45px' }}> 
-              <p style={{ marginBottom: '2em', fontSize: '40px', fontFamily: 'Inter, sans-serif', color: 'white' }}>CINEMA {movie.cin_ID}</p>
-              <p style={{ marginBottom: '2em', fontSize: '30px', fontFamily: 'Inter, sans-serif', fontWeight: '700', color: 'white' }}>{movie.title}</p>
+              <p style={{ marginBottom: '0em', fontSize: '40px', fontFamily: 'Inter, sans-serif', color: 'white' }}>CINEMA {movie.cin_ID}</p>
+              <p style={{ marginBottom: '0em', fontSize: '30px', fontFamily: 'Inter, sans-serif', fontWeight: '700', color: 'white' }}>{movie.title}</p>
+              <p style={{ marginBottom: '2em', fontSize: '15px', fontFamily: 'Inter, sans-serif', fontWeight: '700', color: 'white' }}>{movie.desc}</p>
               <p style={{ marginBottom: '-0.4em', fontSize: '35px', fontFamily: 'Inter, sans-serif', fontWeight: '800', color: 'white' }}>SHOWTIMES</p>
               {movie.airing_time && movie.airing_time.length > 0 && (
                 <p style={{ fontSize: '20px', marginTop: '2em', marginBottom: '2em', fontFamily: 'Inter, sans-serif', color: 'white' }}>
-                  {new Date(movie.airing_time[0].start_time).toLocaleDateString(undefined, {
+                  {`${new Date(movie.airing_time[0].start_time).toLocaleDateString(undefined, {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
-                  })}
+                  })}`} <br />
+                  Duration: {movie.duration} min.
                 </p>
               )}
               <div>
-                {movie.airing_time && movie.airing_time.map((time, index) => (
-                  <Link to={`/seat/${movie._id}/${time._id}`} key={index} style={{ marginRight: '10px' }}>
+              {movie.airing_time && movie.airing_time
+                .slice() // Create a copy of the array to avoid mutating the original
+                .sort((a, b) => new Date(a.start_time) - new Date(b.start_time)) // Sort the array based on start_time
+                .map((time, index) => (
+                <Link to={`/seat/${movie._id}/${time._id}`} key={index} style={{ marginRight: '5px' }}>
                     <Button type="primary" className={time.is_premiere ? "button-premiere" : "button-style"}>
-                      {new Date(time.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
+                      {`${new Date(time.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`}
+                      -{new Date(time.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
                       {time.is_premiere ? (
-                        <p style={{ marginBottom: '0', color: 'red' }}>Premiere</p>
+                      <p style={{ marginBottom: '0', color: 'red' }}>Premiere</p>
                       ) : (
-                        <p style={{ marginBottom: '0', color: 'white' }}>Normal</p>
+                          <p style={{ marginBottom: '0', color: 'white' }}>Normal</p>
                       )}
                     </Button>
-                  </Link>
-                ))}
+                </Link>
+                    ))
+              }
               </div>
             </div>
           </div>

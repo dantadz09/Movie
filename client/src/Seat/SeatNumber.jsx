@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Button } from 'antd';
+import { Row, Col, Button, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
-
+//render seat 
 function SeatNumber({ setSelectedSeatCount, setSelectedSeats, reservedSeats }) {
+  
   const numRows = 8;
   const numCols = 5;
   const navigate = useNavigate(); // Initialize useNavigate hook
 
   const [selectedSeats, setSelectedSeatsState] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
+  //handle toggle seat
   const handleSeatChange = (seatNumber) => {
     const index = selectedSeats.indexOf(seatNumber);
     if (index === -1) {
@@ -19,7 +22,7 @@ function SeatNumber({ setSelectedSeatCount, setSelectedSeats, reservedSeats }) {
   };
 
   // Update the count of selected seats whenever the selected seats change
-  useEffect(() => {
+  useEffect(() => { 
     setSelectedSeatCount(selectedSeats.length);
     setSelectedSeats(selectedSeats); // Pass the array of selected seat values to the parent component
   }, [selectedSeats, setSelectedSeatCount, setSelectedSeats]);
@@ -27,12 +30,24 @@ function SeatNumber({ setSelectedSeatCount, setSelectedSeats, reservedSeats }) {
   useEffect(() => {
     const totalSeats = numRows * numCols;
     const reservedSeatCount = reservedSeats?.reduce((total, reservation) => total + reservation.seat.length, 0);
-    if (reservedSeatCount === totalSeats) {
-      // Show alert and navigate to home page
-      alert("All seats are reserved!");
-      navigate('/'); // Navigate back to home page
+    
+    if (reservedSeatCount >= totalSeats && !modalVisible) {
+      // Show modal indicating all seats are reserved
+      setModalVisible(true); // Set modalVisible to true to prevent the modal from being shown again
+      Modal.error({
+        title: 'All Seats Reserved',
+        content: 'All seats have been reserved!',
+        onOk: () => {
+          setModalVisible(false); // Reset modalVisible when the modal is closed
+          navigate('/'); // Navigate back to home page
+        },
+      });
     }
-  }, [reservedSeats, numRows, numCols, navigate]);
+  }, [reservedSeats, numRows, numCols, navigate, modalVisible]);
+  
+  
+  
+  
 
   const renderButtons = () => {
     const buttons = [];
