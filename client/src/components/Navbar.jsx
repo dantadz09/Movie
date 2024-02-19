@@ -1,13 +1,13 @@
-import React from 'react';
-import { Layout, Menu } from 'antd';
+import React from "react";
+import { Layout, Menu } from "antd";
 const { Header } = Layout;
 
 const Navbar = () => {
   const handleHomeClick = () => {
-    window.location.href = 'http://localhost:3000/';
+    window.location.href = "http://localhost:3000/";
   };
   const handleCancelClick = () => {
-    window.location.href = 'http://localhost:3000/cancel';
+    window.location.href = "http://localhost:3000/cancel";
   };
   return (
     <Header>

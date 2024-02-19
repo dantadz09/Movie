@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import SeatNumber from './SeatNumber';
-import { Button, Card, Input, Modal } from 'antd';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import SeatNumber from "./SeatNumber";
+import { Button, Card, Input, Modal } from "antd";
+import axios from "axios";
 
 function Seat() {
   const [movie, setMovie] = useState(null);
@@ -15,47 +15,85 @@ function Seat() {
   const bgImageSrc = "http://localhost:3000/cinema_bg.jpg"; // Define your background image source here
 
   useEffect(() => {
+    // Event listener for beforeunload event
+    const handleBeforeUnload = (event) => {
+      // Cancel the event to prevent the browser from closing immediately
+      event.preventDefault();
+      // Chrome requires returnValue to be set
+      event.returnValue = "";
+    };
+
+    // Add event listener when the component mounts
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Remove event listener when the component unmounts
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  useEffect(() => {
     async function fetchMovie() {
       try {
-        const response = await axios.get(`http://localhost:1337/api/seat/${movieId}/${airingTimeId}`);
+        const response = await axios.get(
+          `http://localhost:1337/api/seat/${movieId}/${airingTimeId}`
+        );
         if (response.status === 200) {
           setMovie(response.data.data.movie);
-          const reservedSeatsResponse = await axios.get(`http://localhost:1337/api/get-specific-reservations/${movieId}/${airingTimeId}`, {
-            params: {
-              mov_ID: movieId,
-              airing_time: airingTimeId
+          const reservedSeatsResponse = await axios.get(
+            `http://localhost:1337/api/get-specific-reservations/${movieId}/${airingTimeId}`,
+            {
+              params: {
+                mov_ID: movieId,
+                airing_time: airingTimeId,
+              },
             }
-          });
+          );
           if (reservedSeatsResponse.data.success) {
             setReservedSeats(reservedSeatsResponse.data.data);
           }
         } else {
-          throw new Error('Failed to fetch movie');
+          throw new Error("Failed to fetch movie");
         }
       } catch (error) {
-        console.error('Error fetching movie:', error);
+        console.error("Error fetching movie:", error);
       }
     }
 
     fetchMovie();
   }, [movieId, airingTimeId]);
   //get airing Time from the backend
-  const airingTime = movie && movie.airing_time && movie.airing_time.length > 0 ? movie.airing_time.find(time => time._id === airingTimeId) : null;
+  const airingTime =
+    movie && movie.airing_time && movie.airing_time.length > 0
+      ? movie.airing_time.find((time) => time._id === airingTimeId)
+      : null;
   const pricePerTicket = airingTime ? airingTime.price : 0;
   //change time to PH time
-  const airingTimeStart = airingTime ? new Date(airingTime.start_time).toLocaleString("en-US", { timeZone: "Asia/Manila" }) : 'Loading...';
+  const airingTimeStart = airingTime
+    ? new Date(airingTime.start_time).toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      })
+    : "Loading...";
   const subtotal = pricePerTicket * selectedSeatCount;
-  const discountedPrice = Math.min((pricePerTicket * 0.8) * discountCount, pricePerTicket * selectedSeatCount);
+  const discountedPrice = Math.min(
+    pricePerTicket * 0.8 * discountCount,
+    pricePerTicket * selectedSeatCount
+  );
   const discountValue = discountCount * 70;
   const temp = selectedSeatCount - discountCount;
-  const total = Math.max((temp * pricePerTicket) + discountedPrice, 0);
+  const total = Math.max(temp * pricePerTicket + discountedPrice, 0);
 
   const handleDiscountChange = (e) => {
     const value = e.target.value;
     if (!isNaN(value)) {
       // Convert the input value to a number
       const discount = parseInt(value);
-      
+
       // Ensure that discount is within the range of 0 to selectedSeatCount
       if (discount >= 0 && discount <= selectedSeatCount) {
         setDiscountCount(discount);
@@ -65,7 +103,6 @@ function Seat() {
       }
     }
   };
-  
 
   const handleBuyNow = () => {
     if (selectedSeatCount === 0) {
@@ -85,21 +122,21 @@ function Seat() {
         total_price: total,
         senior_citizen: discountCount,
       };
-  
+
       const response = await axios.post(
         "http://localhost:1337/api/add-reservation",
         reservationData
       );
-  
+
       if (response.status === 200) {
         console.log("Reservation created successfully:", response.data);
-  
+
         // Extract reservation ID from the response
         const reservationId = response.data.reservation.reservationId;
-  
+
         setModalVisible(false);
         Modal.success({
-          title: 'Reservation Created Successfully',
+          title: "Reservation Created Successfully",
           content: `Your reservation with Ticket Number ${reservationId} has been created successfully.`,
           onOk: () => window.location.reload(), // Refresh the page after successful reservation
         });
@@ -110,100 +147,165 @@ function Seat() {
       console.error("Error creating reservation:", error);
       setModalVisible(false);
     }
-  };  
+  };
 
   const handleCancel = () => {
     setModalVisible(false);
   };
 
   return (
-      <div style={{ 
-      backgroundImage: `url(${bgImageSrc})`, 
-      backgroundSize: 'cover', 
-      backgroundPosition: 'center', 
-      minHeight: '81vh', 
-      paddingTop: '40px',
-      width: '100%',
-      margin: 'auto'
-      }}>
-      <div className='all-container' style={{marginLeft: '4em'}}>
-      <div className='title-container' style={{ textAlign: 'center' }}>
-        <h1 style={{color: 'white'}}>Cinema {movie ? movie.cin_ID : 'Loading...'}</h1>
-      </div>
-      {movie && (
-        <>
-          <div className='seat-box' style={{ width: '50%', float: 'left' }}>
-            <SeatNumber
-              setSelectedSeatCount={setSelectedSeatCount}
-              setSelectedSeats={setSelectedSeats}
-              reservedSeats={reservedSeats}
-            />
-            <div className='screen-box'>
-              <h2>SCREEN</h2>
-            </div>
-          </div>
-          <div className='info-box'>
-            <h3 style={{ marginBottom: '1em',color: 'white' }}>Movie: {movie.title}</h3>
-            <h3 style={{ marginBottom: '1em',color: 'white' }}>Date/Time: {airingTimeStart}</h3>
-            <h3 style={{ marginBottom: '1em',color: 'white' }}>Tickets: {selectedSeatCount}</h3>
-            <h3 style={{ marginBottom: '1em', color: 'white' }}>Seats: {selectedSeats.sort().join(', ')}</h3>
-            <h3 style={{ marginBottom: '1em',color: 'white' }}>Subtotal: &#8369;{subtotal.toFixed(2)}</h3>
-            <h3 style={{ marginBottom: '1em',color: 'white' }}>Discounted Price: &#8369;{discountValue}</h3>
-            {movie.airing_time && movie.airing_time.some(time => airingTime.is_premiere) ? ( 
-              <h3 style={{ marginBottom: '1em',color: 'white' }}>Discount not available for premiere</h3>
-            ) : (
-              <div style={{ marginBottom: '1em',color: 'white' }}>
-                <h3 style={{ marginBottom: '0.5em',color: 'white' }}>Discount:</h3>
-                <Input
-                  type="number"
-                  value={discountCount}
-                  onChange={handleDiscountChange}
-                  style={{ width: '120px' }} 
-                />
+    <div
+      style={{
+        backgroundImage: `url(${bgImageSrc})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "81vh",
+        paddingTop: "1px",
+        width: "100%",
+        margin: "auto",
+      }}
+    >
+      <div className="all-container" style={{ marginLeft: "4em" }}>
+        <div className="title-container" style={{ textAlign: "center" }}>
+          <h1 style={{ color: "white" }}>
+            Cinema {movie ? movie.cin_ID : "Loading..."}
+          </h1>
+        </div>
+        {movie && (
+          <>
+            <div className="seat-box" style={{ width: "50%", float: "left" }}>
+              <SeatNumber
+                setSelectedSeatCount={setSelectedSeatCount}
+                setSelectedSeats={setSelectedSeats}
+                reservedSeats={reservedSeats}
+              />
+              <div className="screen-box">
+                <h2>SCREEN</h2>
               </div>
-            )}
-            <h3 style={{ marginBottom: '1em',color: 'white' }}>Total: &#8369;{total.toFixed(2)}</h3>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1em' }}>
-            <Button 
-              type="primary" 
-              onClick={handleBuyNow} 
-              disabled={selectedSeats.length === 0 || discountCount > selectedSeatCount} //checks if seats selected is 0 or discount is greater than selected seat
-              style={{ 
-                background: 'white', 
-                fontSize: '16px', 
-                width: '8em', 
-                height: '50px',
-                color: 'black',
-                fontWeight: 'bold' 
-              }}
-            >
-              BUY NOW
-            </Button>
             </div>
-            <div className='card-box' style={{ display: 'flex', alignItems: 'center' }}>
-              <Card style={{ backgroundColor: '#f0f2f5', width: '3em', height: '3em', marginRight: '1em' }} />
-              <h3 style={{color: "white"}}>AVAILABLE</h3>
-              <Card style={{ backgroundColor: '#2596be', width: '3em', height: '3em', marginLeft: '5em', marginRight: '1em' }}></Card>
-              <h3 style={{color: "white"}}>SELECTED</h3>
+            <div className="info-box">
+              <h3 style={{ marginBottom: "0.5em", color: "white" }}>
+                Movie: {movie.title}
+              </h3>
+              <h3 style={{ marginBottom: "0.5em", color: "white" }}>
+                Date/Time: {airingTimeStart}
+              </h3>
+              <h3 style={{ marginBottom: "0.5em", color: "white" }}>
+                Tickets: {selectedSeatCount}
+              </h3>
+              <h3 style={{ marginBottom: "0.5em", color: "white" }}>
+                Seats: {selectedSeats.sort().join(", ")}
+              </h3>
+              <h3 style={{ marginBottom: "0.5em", color: "white" }}>
+                Subtotal: &#8369;{subtotal.toFixed(2)}
+              </h3>
+              <h3 style={{ marginBottom: "0.5em", color: "white" }}>
+                Discounted Price: &#8369;{discountValue.toFixed(2)}
+              </h3>
+              {movie.airing_time &&
+              movie.airing_time.some((time) => airingTime.is_premiere) ? (
+                <h3 style={{ marginBottom: "0.5em", color: "white" }}>
+                  Discount not available for premiere
+                </h3>
+              ) : (
+                <div style={{ marginBottom: "0.5em", color: "white" }}>
+                  <h3 style={{ marginBottom: "0.5em", color: "white" }}>
+                    Discount:
+                  </h3>
+                  <Input
+                    type="number"
+                    value={discountCount}
+                    onChange={handleDiscountChange}
+                    style={{ width: "120px" }}
+                  />
+                </div>
+              )}
+              <h3 style={{ marginBottom: "1em", color: "white" }}>
+                Total: &#8369;{total.toFixed(2)}
+              </h3>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "1em",
+                }}
+              >
+                <Button
+                  type="primary"
+                  onClick={handleBuyNow}
+                  disabled={
+                    selectedSeats.length === 0 ||
+                    discountCount > selectedSeatCount
+                  } //checks if seats selected is 0 or discount is greater than selected seat
+                  style={{
+                    background: "white",
+                    fontSize: "16px",
+                    width: "8em",
+                    height: "50px",
+                    color: "black",
+                    fontWeight: "bold",
+                  }}
+                >
+                  BUY NOW
+                </Button>
+              </div>
+              <div
+                className="card-box"
+                style={{ display: "flex", alignItems: "center" }}
+              >
+                <Card
+                  style={{
+                    backgroundColor: "#f0f2f5",
+                    width: "3em",
+                    height: "3em",
+                    marginRight: "1em",
+                  }}
+                />
+                <h3 style={{ color: "white" }}>AVAILABLE</h3>
+                <Card
+                  style={{
+                    backgroundColor: "#2596be",
+                    width: "3em",
+                    height: "3em",
+                    marginLeft: "5em",
+                    marginRight: "1em",
+                  }}
+                ></Card>
+                <h3 style={{ color: "white" }}>SELECTED</h3>
+              </div>
+              <div
+                className="card-box"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginTop: "0.1em",
+                }}
+              >
+                <Card
+                  style={{
+                    backgroundColor: "red",
+                    width: "3em",
+                    height: "3em",
+                    marginRight: "1em",
+                    marginBottom: "3em",
+                  }}
+                ></Card>
+                <h3 style={{ marginBottom: "3em", color: "white" }}>SOLD</h3>
+              </div>
             </div>
-            <div className='card-box' style={{ display: 'flex', alignItems: 'center', marginTop: '2em' }}>
-              <Card style={{ backgroundColor: 'red', width: '3em', height: '3em', marginRight: '1em', marginBottom: '3em' }}></Card>
-              <h3 style={{ marginBottom: '3em', color: 'white' }}>SOLD</h3>
-            </div>
-          </div>
-        </>
-      )}
-      <Modal
-        title="Confirmation"
-        visible={modalVisible}
-        onOk={handleConfirm}
-        onCancel={handleCancel}
-        cancelText="Cancel"
-        okText="Confirm"
-      >
-        <p>Are you sure you want to proceed with the reservation?</p>
-      </Modal>
-    </div>
+          </>
+        )}
+        <Modal
+          title="Confirmation"
+          visible={modalVisible}
+          onOk={handleConfirm}
+          onCancel={handleCancel}
+          cancelText="Cancel"
+          okText="Confirm"
+        >
+          <p>Are you sure you want to proceed with the reservation?</p>
+        </Modal>
+      </div>
     </div>
   );
 }
